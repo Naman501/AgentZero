@@ -1,14 +1,22 @@
-require('dotenv').config();
-const readline = require('readline/promises')
-const { GoogleGenAI }=require("@google/genai");
+import {config} from 'dotenv'
+import readline from 'readline/promises'
+import { GoogleGenAI } from "@google/genai"
+import {Client} from "@modelcontextprotocol/sdk/client/index.js"
+import {SSEClientTransport} from "@modelcontextprotocol/sdk/client/sse.js"
+config()
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY});
+const  ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY});
+
+const mcpClient = new Client({
+    name:"example-client",
+    version:"1.0.0",
+})
 
 async function main() {
   const response = await ai.models.generateContent({
     model: "gemini-2.0-flash-lite",
     contents: "How may I help you today?",
-  })
+  }) 
   console.log(response.text);
 }
 
@@ -22,6 +30,13 @@ const chatHistory=[]
 const rl= readline.createInterface({
     input: process.stdin,
     output: process.stdout,
+})
+
+mcpClient.connect(new SSEClientTransport( new URL(":3001/sse")))
+.then(async ()=>{
+
+    
+
 })
 
 async function chatLoop(){
